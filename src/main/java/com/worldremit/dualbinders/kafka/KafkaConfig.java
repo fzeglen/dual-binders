@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
@@ -33,9 +34,21 @@ public class KafkaConfig {
     }
 
     @Bean
-    public Function<Flux<StringValue>, Flux<StringValue>> topologyR() {
-        return input -> input.doOnNext(System.out::println)
-                .map(s -> new StringValue(s.getValue() + "XXX"));
+    public Consumer<Flux<StringValue>> topologyR(EmitterProcessor<StringValue> emitterProcessor) {
+        return input -> input
+                .map(s -> new StringValue(s.getValue() + "XXX"))
+                .doOnNext(emitterProcessor::onNext)
+                .subscribe();
+    }
+
+    @Bean
+    public Supplier<Flux<StringValue>> topologyRprod(EmitterProcessor<StringValue> emitterProcessor) {
+        return () -> emitterProcessor;
+    }
+
+    @Bean
+    public EmitterProcessor<StringValue> emitterProcessor() {
+        return EmitterProcessor.create();
     }
 
     @Bean

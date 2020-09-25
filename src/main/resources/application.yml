@@ -7,7 +7,7 @@ remit.kafka:
 spring:
   cloud:
     stream:
-      function.definition: topologyA;topologyB;topologyR;topologyC;topologyD
+      function.definition: topologyA;topologyB;topologyR;topologyRprod;topologyC;topologyD
       bindings:
         topologyA-out-0:
           destination: topic1
@@ -21,7 +21,7 @@ spring:
             useNativeEncoding: true
         topologyR-in-0:
           destination: topic2
-        topologyR-out-0:
+        topologyRprod-out-0:
           destination: topic3
           producer:
             useNativeEncoding: true
