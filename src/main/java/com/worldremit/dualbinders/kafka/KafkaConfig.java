@@ -1,8 +1,8 @@
 package com.worldremit.dualbinders.kafka;
 
 
+import com.worldremit.avro.StringValue;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.ValueMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,34 +19,35 @@ import java.util.function.Supplier;
 public class KafkaConfig {
 
     @Bean
-    public Supplier<Message<String>> topologyA() {
+    public Supplier<Message<StringValue>> topologyA() {
         return () -> MessageBuilder
-                .withPayload(UUID.randomUUID().toString())
+                .withPayload(new StringValue(UUID.randomUUID().toString()))
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
                 .build();
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, String>> topologyB() {
+    public Function<KStream<String, StringValue>, KStream<String, StringValue>> topologyB() {
         return input -> input
-                .mapValues((ValueMapper<String, String>) String::toUpperCase);
+                .mapValues(v -> new StringValue(v.getValue().toUpperCase()));
     }
 
     @Bean
-    public Function<Flux<String>, Flux<String>> topologyR() {
-        return input -> input
-                .map(s -> s + "XXX");
+    public Function<Flux<StringValue>, Flux<StringValue>> topologyR() {
+        return input -> input.doOnNext(System.out::println)
+                .map(s -> new StringValue(s.getValue() + "XXX"));
     }
 
     @Bean
-    public Function<KStream<String, String>, KStream<String, String>> topologyC() {
+    public Function<KStream<String, StringValue>, KStream<String, StringValue>> topologyC() {
         return input -> input
-                .mapValues((ValueMapper<String, String>) String::toLowerCase);
+                .mapValues(v -> new StringValue(v.getValue().toLowerCase()));
     }
 
     @Bean
-    public Consumer<Flux<String>> topologyD() {
+    public Consumer<Flux<StringValue>> topologyD() {
         return input -> input
+                .map(StringValue::getValue)
                 .doOnNext(System.out::println)
                 .subscribe();
     }

@@ -1,5 +1,13 @@
+buildscript {
+    dependencies {
+        classpath("com.commercehub.gradle.plugin:gradle-avro-plugin:0.17.0")
+    }
+}
+
+
+
 plugins {
-    id 'org.springframework.boot' version '2.3.4.RELEASE'
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
 }
@@ -23,6 +31,8 @@ repositories {
 ext {
     set('springCloudVersion', "Hoxton.SR8")
 }
+
+apply plugin: "com.commercehub.gradle.plugin.avro"
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

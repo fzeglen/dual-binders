@@ -11,28 +11,48 @@ spring:
       bindings:
         topologyA-out-0:
           destination: topic1
+          producer:
+            useNativeEncoding: true
         topologyB-in-0:
           destination: topic1
         topologyB-out-0:
           destination: topic2
+          producer:
+            useNativeEncoding: true
         topologyR-in-0:
           destination: topic2
         topologyR-out-0:
           destination: topic3
+          producer:
+            useNativeEncoding: true
         topologyC-in-0:
           destination: topic3
         topologyC-out-0:
           destination: topic4
+          producer:
+            useNativeEncoding: true
         topologyD-in-0:
           destination: topic4
       kafka:
         binder:
           brokers: ${remit.kafka.brokers}
           producer-properties:
+            schema.registry.url: ${remit.kafka.schema.registry.url}
             key.serializer: org.apache.kafka.common.serialization.StringSerializer
+            value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+            value.subject.name.strategy: io.confluent.kafka.serializers.subject.RecordNameStrategy
+          consumer-properties:
+            schema.registry.url: ${remit.kafka.schema.registry.url}
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+            value.subject.name.strategy: io.confluent.kafka.serializers.subject.RecordNameStrategy
+            specific.avro.reader: true
         streams:
           binder:
             brokers: ${remit.kafka.brokers}
             configuration:
               default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+              schema.registry.url: ${remit.kafka.schema.registry.url}
+              value.subject.name.strategy: io.confluent.kafka.serializers.subject.RecordNameStrategy
 

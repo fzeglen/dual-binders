@@ -1,0 +1,8 @@
+@namespace("com.worldremit.avro")
+protocol Reactive {
+
+  record StringValue {
+    string value;
+  }
+
+}
