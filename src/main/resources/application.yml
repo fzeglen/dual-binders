@@ -1,0 +1,38 @@
+server.port: 18080
+
+remit.kafka:
+  schema.registry.url: http://localhost:8085
+  brokers: localhost:9093
+
+spring:
+  cloud:
+    stream:
+      function.definition: topologyA;topologyB;topologyR;topologyC;topologyD
+      bindings:
+        topologyA-out-0:
+          destination: topic1
+        topologyB-in-0:
+          destination: topic1
+        topologyB-out-0:
+          destination: topic2
+        topologyR-in-0:
+          destination: topic2
+        topologyR-out-0:
+          destination: topic3
+        topologyC-in-0:
+          destination: topic3
+        topologyC-out-0:
+          destination: topic4
+        topologyD-in-0:
+          destination: topic4
+      kafka:
+        binder:
+          brokers: ${remit.kafka.brokers}
+          producer-properties:
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        streams:
+          binder:
+            brokers: ${remit.kafka.brokers}
+            configuration:
+              default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+
